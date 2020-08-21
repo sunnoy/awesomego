@@ -209,6 +209,7 @@ func main() {
 	fmt.Println("Deleted deployment.")
 }
 
+// 引导输入韩函数
 func prompt() {
 	fmt.Printf("-> Press Return key to continue.")
 	scanner := bufio.NewScanner(os.Stdin)
