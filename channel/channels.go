@@ -1,26 +1,30 @@
 package main
 
-import (
-	"fmt"
-	"time"
-)
+import "runtime"
 
 func main() {
+	runtime.GOMAXPROCS(2)
 	ch := make(chan int)
 
-	go func() {
-		var sum int = 0
-		for i := 0; i < 10; i++ {
-			sum += i
-		}
-		ch <- sum
-		ch <- sum
-	}()
+	for i := 0; i < 5; i++ {
 
-	fmt.Println(<-ch)
+		i := i
+		go func() {
+			ch <- i
+			close(ch)
+		}()
 
-	time.Sleep(time.Second * 2)
+	}
 
-	fmt.Println(<-ch)
+	for c := range ch {
+		println(c)
+	}
+
+	//select {
+	//case msg := <-ch:
+	//	println(msg)
+	//default:
+	//	println("sss")
+	//}
 
 }
