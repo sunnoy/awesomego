@@ -1,20 +1,17 @@
 package main
 
-import "runtime"
-
 func main() {
-	runtime.GOMAXPROCS(2)
+
+	//runtime.GOMAXPROCS(1)
 	ch := make(chan int)
 
-	for i := 0; i < 5; i++ {
-
-		i := i
-		go func() {
+	go func() {
+		for i := 0; i < 5; i++ {
 			ch <- i
-			close(ch)
-		}()
 
-	}
+		}
+		close(ch)
+	}()
 
 	for c := range ch {
 		println(c)
