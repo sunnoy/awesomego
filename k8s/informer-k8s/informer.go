@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/client-go/informers"
@@ -82,7 +83,7 @@ func main() {
 
 	// 创建自定的资源事件处理函数
 	informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
-		AddFunc:    addPod,
+		AddFunc:    addfun,
 		UpdateFunc: func(interface{}, interface{}) { fmt.Println("update not implemented") }, // 此处省略 workqueue 的使用
 		DeleteFunc: func(interface{}) { fmt.Println("delete not implemented") },
 	})
@@ -98,7 +99,13 @@ func main() {
 
 }
 
-func addPod(obj interface{}) {
+func addfun(obj interface{}) {
 
-	fmt.Println("add a pod:")
+	// 类型断言，如果obj类型是括号后的类型则断言成功
+	// 第一个参数就是括号内的类型
+	// 第二个参数布尔值 表示是否断言成功
+	//pod,ok := obj.(*v1.Pod)
+	pod := obj.(*v1.Pod)
+
+	println(pod.Name)
 }
