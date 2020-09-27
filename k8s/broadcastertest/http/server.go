@@ -8,15 +8,46 @@ package main
 import (
 	"awesomego/k8s/broadcastertest/broadcaster"
 	"encoding/json"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
+	"html/template"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/informers"
+	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
+	"k8s.io/client-go/tools/clientcmd"
 	"log"
 	"net/http"
 	"time"
 )
+
+const homeHTML = `<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>WebSocket Example</title>
+    </head>
+    <body>
+        <pre id="fileData">{{.Data}}</pre>
+        <script type="text/javascript">
+            (function() {
+                var data = document.getElementById("fileData");
+                var conn = new WebSocket("ws://{{.Host}}/ws");
+                conn.onclose = function(evt) {
+                    data.textContent = 'Connection closed';
+                }
+                conn.onmessage = function(evt) {
+                    console.log(evt.data);
+                    data.textContent = evt.data;
+                }
+            })();
+        </script>
+    </body>
+</html>
+`
+
+var homeTempl = template.Must(template.New("name").Parse(homeHTML))
 
 // 初始化 SocketData 通道
 var ResourcesChannel = make(chan broadcaster.SocketData)
@@ -25,7 +56,25 @@ var ResourcesBroadcaster = broadcaster.NewBroadcaster(ResourcesChannel)
 
 func main() {
 
+	SockDate()
+
 	r := gin.Default()
+
+	r.GET("/", func(context *gin.Context) {
+		var v = struct {
+			Host    string
+			Data    string
+			LastMod string
+		}{
+			context.Request.Host,
+			"aaaa",
+			"aaaa",
+		}
+
+		// Execute applies a parsed template to the specified data object,
+		// writing the output to wr.
+		homeTempl.Execute(context.Writer, v)
+	})
 
 	r.GET("/ws", func(c *gin.Context) {
 		wscon := SerWS(c.Writer, c.Request)
@@ -40,7 +89,7 @@ func main() {
 func WriteOnlyWebsocket(connection *websocket.Conn, b *broadcaster.Broadcaster) {
 	// The underlying connection is never closed so this cannot error
 	subscriber, _ := b.Subscribe()
-	go readControl(connection, b, subscriber)
+	//readControl(connection, b, subscriber)
 	write(connection, subscriber)
 
 }
@@ -109,7 +158,11 @@ func websocketSend(connection *websocket.Conn, data broadcaster.SocketData) bool
 		ReportClosing(connection)
 		return false
 	}
-	if err := connection.WriteMessage(websocket.TextMessage, payload); err != nil {
+
+	println(payload)
+
+	payloads := []byte("sssss")
+	if err := connection.WriteMessage(websocket.TextMessage, payloads); err != nil {
 		//logging.Log.Errorf("could not write the message to the websocket client connection, error: %s", err)
 		ReportClosing(connection)
 		return false
@@ -141,50 +194,36 @@ func SerWS(w http.ResponseWriter, r *http.Request) *websocket.Conn {
 
 }
 
-func NewPodController(kind string, messagetype broadcaster.MessageType) {
+func SockDate() {
+	kubeconfig, err := clientcmd.BuildConfigFromFlags("", "/Users/lirui/.kube/config6")
+	if err != nil {
+		fmt.Println(err)
+	}
+	clientset, err := kubernetes.NewForConfig(kubeconfig)
 
-	//NewController()
-}
-
-func NewController(kind string, informer cache.SharedIndexInformer, onCreated, onUpdated, onDeleted broadcaster.MessageType, filter func(interface{}, bool) interface{}) {
-	println("In NewController")
-
-	if filter == nil {
-		filter = func(obj interface{}, skipDeletedCheck bool) interface{} {
-			return obj
-		}
+	if err != nil {
+		fmt.Println(err)
 	}
 
-	informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
-		AddFunc: func(obj interface{}) {
-			println("Controller detected %s '%s' created", kind, obj.(metav1.Object).GetName())
-			data := broadcaster.SocketData{
-				MessageType: onCreated,
-				Payload:     filter(obj, true),
-			}
-			ResourcesChannel <- data
-		},
+	informerFactory := informers.NewSharedInformerFactory(clientset, 0)
+
+	PodInformer := informerFactory.Core().V1().Pods()
+
+	PodInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc: nil,
 		UpdateFunc: func(oldObj, newObj interface{}) {
-			oldSecret, newSecret := oldObj.(metav1.Object), newObj.(metav1.Object)
-			// If resourceVersion differs between old and new, an actual update event was observed
-			if oldSecret.GetResourceVersion() != newSecret.GetResourceVersion() {
-				println("Controller detected %s '%s' updated", kind, oldSecret.GetName())
-				data := broadcaster.SocketData{
-					MessageType: onUpdated,
-					Payload:     filter(newObj, true),
-				}
-				ResourcesChannel <- data
-			}
-		},
-		DeleteFunc: func(obj interface{}) {
-			println("Controller detected %s '%s' deleted", kind, GetDeletedObjectMeta(obj).GetName())
+			fmt.Println("没有定义更新")
 			data := broadcaster.SocketData{
-				MessageType: onDeleted,
-				Payload:     filter(obj, false),
+				MessageType: broadcaster.NamespaceCreated,
+				Payload:     oldObj,
 			}
+
 			ResourcesChannel <- data
+
 		},
+		DeleteFunc: nil,
 	})
+
 }
 
 func GetDeletedObjectMeta(obj interface{}) metav1.Object {
