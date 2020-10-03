@@ -73,19 +73,21 @@ func NewBroadcaster(c chan SocketData) *Broadcaster {
 		for {
 			// msg是SocketData通道
 			msg, channelOpen := <-b.c
+
 			if channelOpen {
 				// 通道打开
-				println("SocketData通道打开了")
+				//fmt.Println(msg)
 				// range函数
 				// Range calls f sequentially for each key and value present in the map.
 				// If f returns false, range stops the iteration.
 				// 将map中的简直对依次作为参数传入到其 函数类型的参数中执行 如果返回false就会停止迭代
 				b.subscribers.Range(func(key, value interface{}) bool {
-					//
+
 					subscriber := key.(*Subscriber)
 					select {
 					// 将数据给订阅者的接收数据通道
 					case subscriber.subChan <- msg:
+
 					case <-subscriber.unsubChan:
 					}
 					return true
@@ -93,7 +95,7 @@ func NewBroadcaster(c chan SocketData) *Broadcaster {
 			} else {
 
 				// 通道关闭
-				println("SocketData通道关闭了")
+
 				b.expiredLock.Lock()
 				b.expired = true
 				b.subscribers.Range(func(key, value interface{}) bool {

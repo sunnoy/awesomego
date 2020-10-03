@@ -15,7 +15,7 @@ import (
 
 func main() {
 	http.HandleFunc("/", SerHome)
-	http.HandleFunc("/ws", SerWS)
+	http.HandleFunc("/wspkg", SerWS)
 
 	if err := http.ListenAndServe(":1989", nil); err != nil {
 		log.Fatal(err)
@@ -32,7 +32,7 @@ func SerWS(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 完成协议升级
-	// ws 是 The Conn type represents a WebSocket connection.
+	// wspkg 是 The Conn type represents a WebSocket connection.
 	ws, err := upgrader.Upgrade(w, r, nil)
 
 	if err != nil {
@@ -105,7 +105,7 @@ const homeHTML = `<!DOCTYPE html>
         <script type="text/javascript">
             (function() {
                 var data = document.getElementById("fileData");
-                var conn = new WebSocket("ws://{{.Host}}/ws?lastMod={{.LastMod}}");
+                var conn = new WebSocket("wspkg://{{.Host}}/wspkg?lastMod={{.LastMod}}");
                 conn.onclose = function(evt) {
                     data.textContent = 'Connection closed';
                 }

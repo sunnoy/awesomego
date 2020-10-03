@@ -165,7 +165,7 @@ func main() {
 	//filename = flag.Args()[0]
 	filename = "/Users/lirui/Downloads/file"
 	http.HandleFunc("/", serveHome)
-	http.HandleFunc("/ws", serveWs)
+	http.HandleFunc("/wspkg", serveWs)
 	if err := http.ListenAndServe(*addr, nil); err != nil {
 		log.Fatal(err)
 	}
@@ -181,7 +181,7 @@ const homeHTML = `<!DOCTYPE html>
         <script type="text/javascript">
             (function() {
                 var data = document.getElementById("fileData");
-                var conn = new WebSocket("ws://{{.Host}}/ws?lastMod={{.LastMod}}");
+                var conn = new WebSocket("wspkg://{{.Host}}/wspkg?lastMod={{.LastMod}}");
                 conn.onclose = function(evt) {
                     data.textContent = 'Connection closed';
                 }

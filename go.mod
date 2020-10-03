@@ -16,9 +16,11 @@ require (
 	golang.org/x/sys v0.0.0-20200828194041-157a740278f4 // indirect
 	golang.org/x/time v0.0.0-20200630173020-3af7569d3a1e // indirect
 	google.golang.org/protobuf v1.25.0 // indirect
-	k8s.io/api v0.18.8
-	k8s.io/apimachinery v0.18.8
-	k8s.io/client-go v0.18.0
-	k8s.io/klog/v2 v2.0.0
+	k8s.io/api v0.19.0
+	k8s.io/apimachinery v0.19.0
+	k8s.io/client-go v0.19.0
+	k8s.io/klog v1.0.0 // indirect
+	k8s.io/klog/v2 v2.2.0
 	k8s.io/utils v0.0.0-20200821003339-5e75c0163111 // indirect
+	sigs.k8s.io/structured-merge-diff/v3 v3.0.0 // indirect
 )

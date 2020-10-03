@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	v1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/tools/cache"
@@ -88,12 +87,12 @@ func main() {
 		DeleteFunc: func(interface{}) { fmt.Println("delete not implemented") },
 	})
 
-	// 获取list之后的对象
-	podLister := podInFormer.Lister()
-
-	podList, err := podLister.List(labels.Everything())
-
-	fmt.Println("podlist", podList[0])
+	//// 获取list之后的对象
+	//podLister := podInFormer.Lister()
+	//
+	//podList, err := podLister.List(labels.Everything())
+	//
+	//fmt.Println("podlist", podList[0])
 
 	<-stopper
 
