@@ -16,7 +16,7 @@ limitations under the License.
 package main
 
 import (
-	"awesomego/cobra/cmd"
+	"awesomego/cobra/genentor/cmd"
 )
 
 func main() {
