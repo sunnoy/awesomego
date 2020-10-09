@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"awesomego/gin/ginscket/server"
+	"awesomego/onemod/gin/ginscket/server"
 	"github.com/gin-gonic/gin"
 )
 

@@ -6,7 +6,7 @@
 package main
 
 import (
-	"awesomego/k8s/broadcastertest/kubeconfig"
+	"awesomego/onemod/k8s/broadcastertest/kubeconfig"
 	"bytes"
 	"context"
 	"fmt"

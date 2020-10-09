@@ -1,8 +1,8 @@
 package main
 
 import (
-	"awesomego/gin/ginscket/controller"
-	"awesomego/gin/ginscket/server"
+	"awesomego/onemod/gin/ginscket/controller"
+	"awesomego/onemod/gin/ginscket/server"
 )
 
 func main() {
