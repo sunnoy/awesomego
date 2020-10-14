@@ -15,7 +15,7 @@ type Sever struct {
 	g *gin.RouterGroup
 }
 
-// 初始化一个 gin Engine 实例
+// 初始化一个 date Engine 实例
 // 这个实例包含在 server 结构体中
 func Init() *Sever {
 	s := &Sever{

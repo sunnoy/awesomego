@@ -6,8 +6,8 @@
 package main
 
 import (
-	"awesomego/onemod/k8s/broadcastertest/broadcaster"
-	"awesomego/onemod/k8s/broadcastertest/kubeconfig"
+	"awesomego/k8s/broadcastertest/broadcaster"
+	"awesomego/k8s/broadcastertest/kubeconfig"
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
