@@ -47,3 +47,6 @@ func registryStream(engine *gin.Engine) {
 
 	})
 }
+
+// curl 请求 -N 不需要buffer
+// curl -v 127.0.0.1:38080/stream -N
