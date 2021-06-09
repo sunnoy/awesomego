@@ -17,6 +17,7 @@ type Counter struct {
 
 // 加1封装
 func (c *Counter) Incr() {
+	// 写的时候加入写锁
 	c.mu.Lock()
 	c.count++
 	c.mu.Unlock()
@@ -24,7 +25,8 @@ func (c *Counter) Incr() {
 
 // 返回结构封装，在这里不加锁也行
 func (c *Counter) Count() uint64 {
-	c.mu.RLocker()
+	//读的时候加入读锁
+	c.mu.RLock()
 
 	// 等待追后的结构返回后进行解锁
 	defer c.mu.RUnlock()
@@ -36,11 +38,12 @@ func main() {
 
 	var counter Counter
 
+	//可以明确区分 reader 和 writer goroutine 的场景，且有⼤量的并发读、少量的并 发写，并且有强烈的性能需求
 	for i := 0; i < 10; i++ {
 		go func() {
 
 			for {
-				counter.Count()
+				println(counter.Count())
 				time.Sleep(time.Millisecond)
 			}
 		}()
@@ -51,5 +54,4 @@ func main() {
 		time.Sleep(time.Second)
 	}
 
-	println(counter.Count())
 }
