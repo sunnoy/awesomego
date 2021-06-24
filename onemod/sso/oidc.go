@@ -8,11 +8,12 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
 
-	oidc "github.com/coreos/go-oidc"
+	oidc "github.com/coreos/go-oidc/v3/oidc"
 	"golang.org/x/oauth2"
 )
 
@@ -36,6 +37,7 @@ func main() {
 		ClientID:     clientID,
 		ClientSecret: clientSecret,
 		RedirectURL:  redirectURL,
+
 		// Discovery returns the OAuth2 endpoints.
 		Endpoint: provider.Endpoint(),
 		// "openid" is a required scope for OpenID Connect flows.
@@ -44,19 +46,22 @@ func main() {
 
 	state := "somestate"
 
-	oidcConfig := &oidc.Config{
-		ClientID: clientID,
-	}
-
 	// 初始化验证器
-	verifier := provider.Verifier(oidcConfig)
+	verifier := provider.Verifier(&oidc.Config{
+		ClientID: clientID,
+		//SkipClientIDCheck: true,
+	})
 
 	// 正常业务服务
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		rawAccessToken := r.Header.Get("Authorization")
 
 		// 第一次登陆么有token 进行跳转到
+
 		if rawAccessToken == "" {
+
+			fmt.Println(rawAccessToken)
+
 			// 跳转的时候带上一个标记
 			// State is a token to protect the user from CSRF attacks. You must
 			// always provide a non-empty string and validate that it matches the
@@ -76,8 +81,9 @@ func main() {
 
 		// 验证 token
 		_, err := verifier.Verify(ctx, parts[1])
-
+		fmt.Println(&oidc.IDToken{})
 		if err != nil {
+			fmt.Println(err)
 			http.Redirect(w, r, oauth2Config.AuthCodeURL(state), http.StatusFound)
 			return
 		}
