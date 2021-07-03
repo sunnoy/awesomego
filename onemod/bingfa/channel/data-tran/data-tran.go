@@ -21,7 +21,6 @@ func newWorker(id int, ch chan Token, nextCh chan Token) {
 		// 取得了令牌 立即打印出自己的编号
 		token := <-ch
 		fmt.Println((id + 1))
-
 		time.Sleep(time.Second)
 
 		// 将令牌交给下一家

@@ -11,11 +11,15 @@ import (
 	"net/http"
 )
 
-var upgrader = websocket.Upgrader{}
+var upgrader = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
+}
 
 func main() {
 
-	http.HandleFunc("/echo", echo)
+	http.HandleFunc("/ws", echo)
 	//http.HandleFunc("/", home)
 	log.Fatal(http.ListenAndServe(":1989", nil))
 
